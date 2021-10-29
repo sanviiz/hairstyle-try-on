@@ -1,0 +1,7 @@
+CelebAMask-HQ/
+face_landmark.py
+image_segmentation/__pycache__
+image_segmentation/saved_images/*
+image_segmentation/inference_images/*
+image_segmentation/saved_images_50epoch
+*.tar
