@@ -1,5 +1,4 @@
 CelebAMask-HQ/
-face_landmark.py
 image_segmentation/__pycache__
 
 image_segmentation/saved_images/*
