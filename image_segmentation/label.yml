@@ -1,0 +1,21 @@
+class: 
+  - 'others'
+  - 'neck_and_cloth'
+  - 'hair'
+  - 'skin'
+  - 'ear'
+
+color: 
+  - [0,0,0] # black
+  - [0,255,0] # green
+  - [255,0,0] # red
+  - [0,0,255] # blue
+  - [255,0,255] # pink
+
+label: 
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+            

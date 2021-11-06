@@ -1,6 +1,8 @@
 CelebAMask-HQ/
 image_segmentation/__pycache__
+__pycache__*
 
+checkpoints/
 image_segmentation/saved_images/*
 !image_segmentation/saved_images/.gitkeep
 

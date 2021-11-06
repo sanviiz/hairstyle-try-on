@@ -1,16 +1,17 @@
 import torch
 import torchvision
+import os
+import sys
+sys.path.append(os.path.join(os.getcwd(), 'image_segmentation'))
 from dataset import celebamask_Dataset
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import yaml
 
-label = {
-            'class':['others', 'neck_and_cloth','hair', 'skin', 'ear'],
-            'color':[np.array([0,0,0]), np.array([0,255,0]), np.array([255,0,0]), np.array([0,0,255]), np.array([255,0,255])],
-            'label': [0, 1, 2, 3, 4]
-        }
+with open(os.path.join("image_segmentation", "label.yml"), 'r') as f:
+    label = yaml.safe_load(f)
+    label['color'] = [np.array(c) for c in label['color']]    
 
 def get_loaders(train_dir, train_maskdir, batch_size, train_transform, num_workers, pin_memory=True, train_test_split=0.9):
     ds = celebamask_Dataset(

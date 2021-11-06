@@ -5,6 +5,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import yaml
 
 
 
@@ -14,11 +15,9 @@ class celebamask_Dataset(Dataset):
         self.mask_dir = mask_dir
         self.transform = transform
         self.images = os.listdir(image_dir)
-        self.label = {
-            'class':['others', 'neck_and_cloth','hair', 'skin', 'ear'],
-            'color':[np.array([0,0,0]), np.array([0,255,0]), np.array([255,0,0]), np.array([0,0,255]), np.array([255,0,255])],
-            'label': [0, 1, 2, 3, 4]
-        }
+        with open(os.path.join("image_segmentation", "label.yml"), 'r') as f:
+            self.label = yaml.safe_load(f)
+            self.label['color'] = [np.array(c) for c in self.label['color']]    
 
     def __len__(self):
         return len(self.images)
