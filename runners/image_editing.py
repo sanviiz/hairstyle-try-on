@@ -78,7 +78,6 @@ class Diffusion(object):
         elif self.model_var_type == 'fixedsmall':
             self.logvar = np.log(np.maximum(posterior_variance, 1e-20))
         
-    def image_editing_sample(self):
         print("Loading model")
         if self.config.data.dataset == "LSUN":
             if self.config.data.category == "bedroom":
@@ -89,22 +88,24 @@ class Diffusion(object):
             url = "https://image-editing-test-12345.s3-us-west-2.amazonaws.com/checkpoints/celeba_hq.ckpt"
         else:
             raise ValueError
-
-        model = Model(self.config)
+            
+        self.model = Model(self.config)
         ckpt = torch.hub.load_state_dict_from_url(url, model_dir='checkpoints/', map_location=self.device)
-        model.load_state_dict(ckpt)
-        model.to(self.device)
-        model = torch.nn.DataParallel(model)
+        self.model.load_state_dict(ckpt)
+        self.model.to(self.device)
+        self.model = torch.nn.DataParallel(self.model)
         print("Model loaded")
+        
+    def image_editing_sample(self, img, mask):
         ckpt_id = 0
 
         # download_process_data(path="colab_demo")
         n = self.config.sampling.batch_size
-        model.eval()
+        self.model.eval()
         print("Start sampling")
         with torch.no_grad():
-            name = self.args.npy_name
-            [mask, img] = torch.load("colab_demo/{}.pth".format(name))
+            # name = self.args.npy_name
+            # [mask, img] = torch.load("colab_demo/{}.pth".format(name))
 
             mask = mask.to(self.config.device)
             img = img.to(self.config.device)
@@ -125,7 +126,7 @@ class Diffusion(object):
                 with tqdm(total=total_noise_levels, desc="Iteration {}".format(it)) as progress_bar:
                     for i in reversed(range(total_noise_levels)):
                         t = (torch.ones(n) * i).to(self.device)
-                        x_ = image_editing_denoising_step_flexible_mask(x, t=t, model=model,
+                        x_ = image_editing_denoising_step_flexible_mask(x, t=t, model=self.model,
                                                                         logvar=self.logvar,
                                                                         betas=self.betas)
                         x = x0 * a[i].sqrt() + e * (1.0 - a[i]).sqrt()
