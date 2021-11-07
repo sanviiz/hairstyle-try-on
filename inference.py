@@ -130,8 +130,10 @@ def main():
 
 
     # detect face landmark and transform image
-    face_landmark_transform(target_image, target_mask, source_image, source_mask)
+    transformed_image = face_landmark_transform(target_image, target_mask, source_image, source_mask)
 
+    plt.imshow(transformed_image)
+    plt.figure()
     plt.imshow(target_image)
     plt.figure()
     plt.imshow(source_image)
