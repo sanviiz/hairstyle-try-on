@@ -2,6 +2,8 @@ CelebAMask-HQ/
 image_segmentation/__pycache__
 __pycache__*
 
+60.jpg
+61.jpg
 checkpoints/
 image_segmentation/saved_images/*
 
