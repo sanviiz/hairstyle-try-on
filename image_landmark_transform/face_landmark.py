@@ -48,14 +48,14 @@ def crop_image_by_mask(method, image, mask):
         generate_mask = 255 * \
             np.ones((mask.shape), dtype=int)
         generate_mask[(mask == np.array(
-            [0, 0, 255])).all(axis=2)] = 0  # Red only
+            [255, 0, 0])).all(axis=2)] = 0  # Red only
         croped_image = np.where(
             generate_mask == 0, image, 255)
     elif method == "no_hair":
         generate_mask = np.zeros(
             (mask.shape), dtype=int)
         generate_mask[(mask == np.array(
-            [0, 0, 255])).all(axis=2) | (mask == np.array(
+            [255, 0, 0])).all(axis=2) | (mask == np.array(
                 [0, 0, 0])).all(axis=2)] = 255  # Red and black
         croped_image = np.where(
             generate_mask == 0, image, 255)
