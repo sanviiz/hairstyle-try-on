@@ -7,35 +7,35 @@ import matplotlib.pyplot as plt
 # INITIALIZING OBJECTS
 mp_face_mesh = mp.solutions.face_mesh
 
-IMAGE_FOLDER = 'images'
+# IMAGE_FOLDER = 'images'
 
-static_image_name = '82.jpg'
-transform_image_name = '92.jpg'
+# static_image_name = '82.jpg'
+# transform_image_name = '92.jpg'
 
-static_image_mask_name = '82_seg.png'
-transform_image_mask_name = '92_seg.png'
+# static_image_mask_name = '82_seg.png'
+# transform_image_mask_name = '92_seg.png'
 
-static_image = cv2.imread(os.path.join(
-    IMAGE_FOLDER, static_image_name))
-transform_image = cv2.imread(os.path.join(
-    IMAGE_FOLDER, transform_image_name))
+# static_image = cv2.imread(os.path.join(
+#     IMAGE_FOLDER, static_image_name))
+# transform_image = cv2.imread(os.path.join(
+#     IMAGE_FOLDER, transform_image_name))
 
-static_mask = cv2.imread(
-    os.path.join(IMAGE_FOLDER, static_image_mask_name))
-transform_mask = cv2.imread(
-    os.path.join(IMAGE_FOLDER, transform_image_mask_name))
-
-
-def resize_image(image):
-    return cv2.resize(image, (256, 256),
-                      interpolation=cv2.INTER_AREA)
+# static_mask = cv2.imread(
+#     os.path.join(IMAGE_FOLDER, static_image_mask_name))
+# transform_mask = cv2.imread(
+#     os.path.join(IMAGE_FOLDER, transform_image_mask_name))
 
 
-# Resize image before processing.
-static_image = resize_image(static_image)
-static_mask = resize_image(static_mask)
-transform_image = resize_image(transform_image)
-transform_mask = resize_image(transform_mask)
+# def resize_image(image):
+#     return cv2.resize(image, (256, 256),
+#                       interpolation=cv2.INTER_AREA)
+
+
+# # Resize image before processing.
+# static_image = resize_image(static_image)
+# static_mask = resize_image(static_mask)
+# transform_image = resize_image(transform_image)
+# transform_mask = resize_image(transform_mask)
 
 
 def get_xy_coordinates(results, image_size):
@@ -102,7 +102,8 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
         transformed_image_hair != 255, transformed_image_hair, static_image_no_hair)
 
     plt.imshow(final_image)
-    plt.show()
+    plt.figure()
+    # plt.show()
 
 
 if __name__ == "__main__":

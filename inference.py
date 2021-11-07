@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from image_segmentation.segment_inference import face_segment
 from runners.image_editing import Diffusion
+from image_landmark_transform.face_landmark import face_landmark_transform
 
 
 def parse_args_and_config():
@@ -33,15 +34,15 @@ def parse_args_and_config():
     parser.add_argument('--seg_model_path', type=str, default=os.path.join("image_segmentation", "my_checkpoint.pth.tar"), help='Path to the segmentation model')
     parser.add_argument('--target_image_path', type=str, required=True, help='Path to the target image path')
     parser.add_argument('--source_image_path', type=str, required=True, help='Path to the source image path')
-    parser.add_argument('--image_height', type=int, default=128, help='segmented image height')
-    parser.add_argument('--image_width', type=int, default=128, help='segmented image width')
+    parser.add_argument('--image_size', type=tuple, default=(256,256), help='output image size (height, width)')
+    parser.add_argument('--input_image_size', type=tuple, default=(128,128), help='input image size before segment (height, width)')
     parser.add_argument('--label_config', type=str, default=os.path.join("image_segmentation", "label.yml"), help='Path to the label.yml')
     parser.add_argument('--save_forder', type=str, default='segmented_images', help='Path to the segmented folder')
 
     args = parser.parse_args()
 
     # parse config file
-    with open(os.path.join('configs', args.config), 'r') as f:
+    with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
     new_config = dict2namespace(config)
 
@@ -49,18 +50,56 @@ def parse_args_and_config():
     if not isinstance(level, int):
         raise ValueError('level {} not supported'.format(args.verbose))
 
-    return args
+    handler1 = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)s - %(filename)s - %(asctime)s - %(message)s')
+    handler1.setFormatter(formatter)
+    logger = logging.getLogger()
+    logger.addHandler(handler1)
+    logger.setLevel(level)
+
+    os.makedirs(os.path.join(args.exp, 'image_samples'), exist_ok=True)
+    args.image_folder = os.path.join(args.exp, 'image_samples', args.image_folder)
+    if not os.path.exists(args.image_folder):
+        os.makedirs(args.image_folder)  
+    else:
+        overwrite = False
+        if args.ni:
+            overwrite = True
+        else:
+            response = input("Image folder already exists. Overwrite? (Y/N)")
+            if response.upper() == 'Y':
+                overwrite = True
+        
+        if overwrite:
+            shutil.rmtree(args.image_folder)
+            os.makedirs(args.image_folder)
+        else:
+            print("Output image folder exists. Program halted.")
+            sys.exit(0)
+    
+    # add device
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    logging.info("Using device: {}".format(device))
+    new_config.device = device
+
+    # set random seed
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+    
+    torch.backends.cudnn.benchmark = True
+
+    return args, new_config
 
 def read_image(image_path):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return image
 
-def get_config(file):
-    with open(os.path.join('tutorial_code', 'configs', file), 'r') as f:
-        config = yaml.safe_load(f)
-    new_config = dict2namespace(config)
-    return new_config
+def resize_image(image, image_size:tuple):
+    image_height, image_width = image_size[0], image_size[1]
+    return cv2.resize(image, (image_height, image_width), interpolation = cv2.INTER_NEAREST)
 
 def dict2namespace(config):
     namespace = argparse.Namespace()
@@ -73,20 +112,33 @@ def dict2namespace(config):
     return namespace
 
 def main():
-    args = parse_args_and_config()
+    args, config = parse_args_and_config()
     segment = face_segment(args)
+    # read original image
     target_image = read_image(args.target_image_path)
     source_image = read_image(args.source_image_path)
-    target_segment = segment.segmenting(image_path=args.target_image_path)
-    source_segment = segment.segmenting(image_path=args.source_image_path)
+
+    # infer image segmentation
+    target_mask = segment.segmenting(image=target_image)
+    source_mask = segment.segmenting(image=source_image)
+
+    # resize image and mask
+    target_image = resize_image(target_image, args.image_size)
+    source_image = resize_image(source_image, args.image_size)
+    target_mask = resize_image(target_mask, args.image_size)
+    source_mask = resize_image(source_mask, args.image_size)
+
+
+    # detect face landmark and transform image
+    face_landmark_transform(target_image, target_mask, source_image, source_mask)
 
     plt.imshow(target_image)
     plt.figure()
     plt.imshow(source_image)
     plt.figure()
-    plt.imshow(target_segment.squeeze().permute(1, 2, 0))
+    plt.imshow(target_mask)
     plt.figure()
-    plt.imshow(source_segment.squeeze().permute(1, 2, 0))
+    plt.imshow(source_mask)
     plt.show()
 
 if __name__ == '__main__':
