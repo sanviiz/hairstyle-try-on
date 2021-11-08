@@ -1,8 +1,6 @@
 import cv2
 import mediapipe as mp
-import os
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Initializing objects
 mp_face_mesh = mp.solutions.face_mesh
@@ -41,14 +39,14 @@ def transform_process(image, matrix):
         image.shape[1], image.shape[0]))
 
 
-def crop_image_by_mask(method, image, mask):
+def crop_image_by_mask(method, image, mask, color):
     if method == 'hair_only':
         generate_mask = 255 * \
             np.ones((mask.shape), dtype=int)
         generate_mask[(mask == np.array(
             [255, 0, 0])).all(axis=2)] = 0  # Red only
         croped_image = np.where(
-            generate_mask == 0, image, 255)
+            generate_mask == 0, image, color)
         croped_mask = np.where(generate_mask == 0, mask, 0)
     elif method == "no_hair":
         generate_mask = np.zeros(
@@ -57,14 +55,14 @@ def crop_image_by_mask(method, image, mask):
             [255, 0, 0])).all(axis=2) | (mask == np.array(
                 [0, 0, 0])).all(axis=2)] = 255  # Red and black
         croped_image = np.where(
-            generate_mask == 0, image, 255)
+            generate_mask == 0, image, color)
         croped_mask = np.where(generate_mask == 0, mask, 0)
     return croped_image, croped_mask
 
 
-def merge_head_part(type, hair, face):
+def merge_head_part(type, hair, face, color=[]):
     if type == 'image':
-        return np.where(hair != 255, hair, face)
+        return np.where(hair != color, hair, face)
     elif type == 'mask':
         head = face.copy()
         head[(hair == np.array([255, 0, 0])).all(
@@ -72,7 +70,27 @@ def merge_head_part(type, hair, face):
         return head
 
 
-def face_landmark_transform(static_image, static_mask, transform_image, transform_mask):
+def background_color_handle(color):  # Default white
+    if color == 'black':
+        pixel = [0, 0, 0]
+    elif color == 'white':
+        pixel = [255, 255, 255]
+    elif color == 'red':
+        pixel = [255, 0, 0]
+    elif color == 'green':
+        pixel = [0, 255, 0]
+    elif color == 'blue':
+        pixel = [0, 0, 255]
+    elif type(color) == list:
+        pixel = color
+    else:
+        print('Error: background color input invalid')
+    return pixel
+
+
+def face_landmark_transform(static_image, static_mask, transform_image, transform_mask, background='white'):
+    background_color_list = background_color_handle(background)
+
     static_landmark_coordinates, transform_landmark_coordinates = get_landmark_coordinates(
         static_image), get_landmark_coordinates(
         transform_image)
@@ -85,22 +103,24 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
         transform_mask, affine_matrix)
 
     static_image_no_hair, static_mask_no_hair = crop_image_by_mask(
-        'no_hair', static_image, static_mask)
+        'no_hair', static_image, static_mask, background_color_list)
     transformed_image_hair, transformed_mask_hair = crop_image_by_mask(
-        'hair_only', transformed_image, transformed_mask)
+        'hair_only', transformed_image, transformed_mask, background_color_list)
 
     face_landmark_transform_image = merge_head_part(
-        'image', transformed_image_hair, static_image_no_hair)
+        'image', transformed_image_hair, static_image_no_hair, background_color_list)
     face_landmark_transform_mask = merge_head_part(
         'mask', transformed_mask_hair, static_mask_no_hair)
 
     output_object = {
         'result_image': face_landmark_transform_image,
+        'hair_image': transformed_image_hair,
+        'no_hair_image': static_image_no_hair,
+        'transformed_image': transformed_image,
         'result_mask': face_landmark_transform_mask,
         'hair_mask': transformed_mask_hair,
         'no_hair_mask': static_mask_no_hair,
         'transformed_mask': transformed_mask,
-        'transformed_image': transformed_image,
     }
 
     return output_object

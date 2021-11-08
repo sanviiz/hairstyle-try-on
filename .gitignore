@@ -2,6 +2,8 @@ CelebAMask-HQ/
 image_segmentation/__pycache__
 __pycache__*
 
+image_landmark_transform/test.py
+
 checkpoints/
 image_segmentation/saved_images/*
 
