@@ -50,10 +50,12 @@ def crop_image_by_mask(method, image, mask, color):
         croped_mask = np.where(generate_mask == 0, mask, 0)
     elif method == "no_hair":
         generate_mask = np.zeros(
-            (mask.shape), dtype=int)
+            (mask.shape), np.uint8)
         generate_mask[(mask == np.array(
             [255, 0, 0])).all(axis=2) | (mask == np.array(
                 [0, 0, 0])).all(axis=2)] = 255  # Red and black
+        kernel = np.ones((3, 3), np.uint8)
+        generate_mask = cv2.morphologyEx(generate_mask, cv2.MORPH_CLOSE, kernel)
         croped_image = np.where(
             generate_mask == 0, image, color)
         croped_mask = np.where(generate_mask == 0, mask, 0)
