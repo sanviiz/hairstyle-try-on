@@ -10,3 +10,6 @@ image_segmentation/saved_images/*
 image_segmentation/saved_images_50epoch
 
 *.tar
+
+image_artifact_fill/test.py
+testfn.py
