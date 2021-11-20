@@ -34,12 +34,17 @@ def background_artifact_fill(original_image, original_mask, new_image, backgroun
 
 
 def face_artifact_fill(original_image, original_mask, new_image,
-                       new_mask, new_segment, face_radius=5, background_radius=25):
-    filled_bg_artifact = background_artifact_fill(
-        original_image, original_mask, new_image, background_radius).astype('uint8')
+                       new_mask, new_segment, face_radius=5, background_radius=25,
+                       had_background=0):
+    if had_background:
+        filled_bg_artifact = background_artifact_fill(
+            original_image, original_mask, new_image, background_radius).astype('uint8')
+    else:
+        filled_bg_artifact = new_image.astype('uint8')
     diff = np.where((convert_to_gray(new_mask) == convert_to_gray(new_segment)),
                     0, 255).astype('uint8')
     filled_face_artifact = cv2.inpaint(filled_bg_artifact, diff,
                                        face_radius, cv2.INPAINT_TELEA)
 
     return filled_face_artifact
+

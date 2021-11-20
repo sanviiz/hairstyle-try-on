@@ -9,7 +9,7 @@ mp_face_mesh = mp.solutions.face_mesh
 def get_xy_coordinates(results, image_size):
     x_coordinates = []
     y_coordinates = []
-    point_lm_index = [10, 152, 234]  # Face landmark position
+    point_lm_index = [10, 159, 386, 152] # [10, 159, 386, 152] # [10, 159, 386]  # Face landmark position
     for face in results.multi_face_landmarks:
         for landmark in face.landmark:
             x = landmark.x
@@ -26,6 +26,11 @@ def get_landmark_coordinates(image):
     with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5) as face_mesh:
         landmark_results = face_mesh.process(image)
         x, y = get_xy_coordinates(landmark_results, image.shape)
+        
+        ## drawing circle to landmark points
+        # for xx, yy in zip(x, y):
+        #     cv2.circle(image, (xx, yy), radius=3, color=(225, 0, 100), thickness=3)
+
         landmark_coordinates = []
         for idx in range(len(x)):
             landmark_coordinates.append((x[idx], y[idx]))
@@ -35,7 +40,9 @@ def get_landmark_coordinates(image):
 
 
 def transform_process(image, matrix):
-    return cv2.warpAffine(src=image, M=matrix, dsize=(
+    # return cv2.warpAffine(src=image, M=matrix, dsize=(
+    #     image.shape[1], image.shape[0]))
+    return cv2.warpPerspective(src=image, M=matrix, dsize=(
         image.shape[1], image.shape[0]))
 
 
@@ -89,6 +96,15 @@ def background_color_handle(color):  # Default white
         print('Error: background color input invalid')
     return pixel
 
+def color_mask_to_binary_mask_tensor(mask):
+    mask[(mask != np.array([0,0,0])).any(axis=2)] = 255
+    # print(mask.shape)
+    return mask
+
+def set_anycolor_to_black(mask, anycolor=[255,0,0]):
+    mask[(mask == np.array(anycolor)).all(axis=2)] = 0
+    return mask
+
 
 def face_landmark_transform(static_image, static_mask, transform_image, transform_mask, background='white'):
     background_color_list = background_color_handle(background)
@@ -97,12 +113,14 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
         static_image), get_landmark_coordinates(
         transform_image)
 
-    affine_matrix = cv2.getAffineTransform(
-        transform_landmark_coordinates, static_landmark_coordinates)
+    # transform_matrix = cv2.getAffineTransform(
+    #     transform_landmark_coordinates, static_landmark_coordinates)
+    transform_matrix = cv2.getPerspectiveTransform(
+         transform_landmark_coordinates, static_landmark_coordinates)
 
     transformed_image, transformed_mask = transform_process(
-        transform_image, affine_matrix), transform_process(
-        transform_mask, affine_matrix)
+        transform_image, transform_matrix), transform_process(
+        transform_mask, transform_matrix)
 
     static_image_no_hair, static_mask_no_hair = crop_image_by_mask(
         'no_hair', static_image, static_mask, background_color_list)
@@ -114,15 +132,18 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
     face_landmark_transform_mask = merge_head_part(
         'mask', transformed_mask_hair, static_mask_no_hair)
 
+    only_fixed_face = set_anycolor_to_black(face_landmark_transform_mask.copy())
+    
     output_object = {
         'result_image': face_landmark_transform_image,
         'hair_image': transformed_image_hair,
         'no_hair_image': static_image_no_hair,
         'transformed_image': transformed_image,
         'result_mask': face_landmark_transform_mask,
-        'hair_mask': transformed_mask_hair,
-        'no_hair_mask': static_mask_no_hair,
+        'hair_mask': color_mask_to_binary_mask_tensor(transformed_mask_hair),
+        'no_hair_mask': color_mask_to_binary_mask_tensor(static_mask_no_hair),
         'transformed_mask': transformed_mask,
+        'only_fixed_face': color_mask_to_binary_mask_tensor(only_fixed_face)
     }
 
     return output_object
