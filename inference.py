@@ -35,7 +35,7 @@ def parse_args_and_config():
     parser.add_argument('--target_image_path', type=str, required=True, help='Path to the target image path')
     parser.add_argument('--source_image_path', type=str, required=True, help='Path to the source image path')
     parser.add_argument('--image_size', type=tuple, default=(256,256), help='output image size (height, width)')
-    parser.add_argument('--input_image_size', type=tuple, default=(128,128), help='input image size before segment (height, width)')
+    parser.add_argument('--input_image_size', type=tuple, default=(256,256), help='input image size before segment (height, width)')
     parser.add_argument('--label_config', type=str, default=os.path.join("image_segmentation", "label.yml"), help='Path to the label.yml')
     parser.add_argument('--save_forder', type=str, default='segmented_images', help='Path to the segmented folder')
 
@@ -130,7 +130,7 @@ def main():
 
 
     # detect face landmark and transform image
-    transformed_image = face_landmark_transform(target_image, target_mask, source_image, source_mask)
+    transformed_image = face_landmark_transform(target_image, target_mask, source_image, source_mask)["result_image"]
 
     plt.imshow(transformed_image)
     plt.figure()
