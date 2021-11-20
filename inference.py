@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from image_segmentation.segment_inference import face_segment
 from runners.image_editing import Diffusion
 from image_landmark_transform.face_landmark import face_landmark_transform
+from image_artifact_fill.artifact_fill import face_artifact_fill
 
 
 def parse_args_and_config():
@@ -27,7 +28,7 @@ def parse_args_and_config():
     parser.add_argument('-i', '--image_folder', type=str, default='images', help="The folder name of samples")
     parser.add_argument('--ni', action='store_true', help="No interaction. Suitable for Slurm Job launcher")
     # parser.add_argument('--npy_name', type=str, required=True)
-    parser.add_argument('--sample_step', type=int, default=3, help='Total sampling steps')
+    parser.add_argument('--sample_step', type=int, default=1, help='Total sampling steps')
     parser.add_argument('--t', type=int, default=400, help='Sampling noise scale')
 
     # image segmentation
@@ -38,6 +39,9 @@ def parse_args_and_config():
     parser.add_argument('--input_image_size', type=tuple, default=(256,256), help='input image size before segment (height, width)')
     parser.add_argument('--label_config', type=str, default=os.path.join("image_segmentation", "label.yml"), help='Path to the label.yml')
     parser.add_argument('--save_forder', type=str, default='segmented_images', help='Path to the segmented folder')
+
+    # others
+    # parser.add_argument('--had_bg', type=int, default=0, help='reserve background (1) or not (0)')
 
     args = parser.parse_args()
 
@@ -128,20 +132,48 @@ def main():
     target_mask = resize_image(target_mask, args.image_size)
     source_mask = resize_image(source_mask, args.image_size)
 
-
     # detect face landmark and transform image
-    transformed_image = face_landmark_transform(target_image, target_mask, source_image, source_mask)["result_image"]
+    transform_outputs = face_landmark_transform(target_image, target_mask, source_image, source_mask)
+    transformed_image, transformed_mask = transform_outputs["result_image"], transform_outputs["result_mask"]
+    transformed_segment = segment.segmenting(image=transformed_image)
 
-    plt.imshow(transformed_image)
-    plt.figure()
-    plt.imshow(target_image)
-    plt.figure()
-    plt.imshow(source_image)
-    plt.figure()
-    plt.imshow(target_mask)
-    plt.figure()
-    plt.imshow(source_mask)
-    plt.show()
+    # fill artifacts 
+    filled_image = face_artifact_fill(target_image, target_mask, transformed_image, transformed_mask, transformed_segment)
+
+    # SDEdit
+    sde_mask = transform_outputs['only_fixed_face']
+    # kernel = np.ones((5,5),np.uint8)
+    # erosion = cv2.erode(img, kernel,iterations = 1)
+    
+
+    print(">" * 80)
+    logging.info("Exp instance id = {}".format(os.getpid()))
+    logging.info("Exp comment = {}".format(args.comment))
+    logging.info("Config =")
+    print("<" * 80)
+
+    try:
+        runner = Diffusion(args, config)
+        runner.image_editing_sample(filled_image, sde_mask)
+    except Exception:
+        logging.error(traceback.format_exc())
+
+    return 0
+
+
+
+    # plt.imshow(sde_mask)
+    # plt.figure()
+    # plt.imshow(filled_image)
+    # plt.figure()
+    # plt.imshow(target_image)
+    # plt.figure()
+    # plt.imshow(source_image)
+    # plt.figure()
+    # plt.imshow(target_mask)
+    # plt.figure()
+    # plt.imshow(source_mask)
+    # plt.show()
 
 if __name__ == '__main__':
     sys.exit(main())

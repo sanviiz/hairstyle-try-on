@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from tqdm import tqdm
-
+import matplotlib.pyplot as plt
 import torch
 import torchvision.utils as tvu
 
@@ -106,14 +106,23 @@ class Diffusion(object):
         with torch.no_grad():
             # name = self.args.npy_name
             # [mask, img] = torch.load("colab_demo/{}.pth".format(name))
+            # numpy to tensor
+            mask = torch.tensor(mask/255,).to(dtype=torch.float32)
+            img = torch.tensor(img/255.).to(dtype=torch.float32)
 
+            mask = mask.permute(2,0,1)
+            img = img.permute(2,0,1)
+            
             mask = mask.to(self.config.device)
             img = img.to(self.config.device)
             img = img.unsqueeze(dim=0)
             img = img.repeat(n, 1, 1, 1)
             x0 = img
+            # print(x0.dtype)
+            # print(x0.shape)
 
             tvu.save_image(x0, os.path.join(self.args.image_folder, f'original_input.png'))
+            tvu.save_image(mask, os.path.join(self.args.image_folder, f'mask.png'))
             x0 = (x0 - 0.5) * 2.
 
             for it in range(self.args.sample_step):

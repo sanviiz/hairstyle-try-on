@@ -96,6 +96,15 @@ def background_color_handle(color):  # Default white
         print('Error: background color input invalid')
     return pixel
 
+def color_mask_to_binary_mask_tensor(mask):
+    mask[(mask != np.array([0,0,0])).any(axis=2)] = 255
+    # print(mask.shape)
+    return mask
+
+def set_anycolor_to_black(mask, anycolor=[255,0,0]):
+    mask[(mask == np.array(anycolor)).all(axis=2)] = 0
+    return mask
+
 
 def face_landmark_transform(static_image, static_mask, transform_image, transform_mask, background='white'):
     background_color_list = background_color_handle(background)
@@ -123,15 +132,18 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
     face_landmark_transform_mask = merge_head_part(
         'mask', transformed_mask_hair, static_mask_no_hair)
 
+    only_fixed_face = set_anycolor_to_black(face_landmark_transform_mask.copy())
+    
     output_object = {
         'result_image': face_landmark_transform_image,
         'hair_image': transformed_image_hair,
         'no_hair_image': static_image_no_hair,
         'transformed_image': transformed_image,
         'result_mask': face_landmark_transform_mask,
-        'hair_mask': transformed_mask_hair,
-        'no_hair_mask': static_mask_no_hair,
+        'hair_mask': color_mask_to_binary_mask_tensor(transformed_mask_hair),
+        'no_hair_mask': color_mask_to_binary_mask_tensor(static_mask_no_hair),
         'transformed_mask': transformed_mask,
+        'only_fixed_face': color_mask_to_binary_mask_tensor(only_fixed_face)
     }
 
     return output_object
