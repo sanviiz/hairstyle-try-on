@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from image_segmentation.segment_inference import face_segment
 from runners.image_editing import Diffusion
 from image_landmark_transform.face_landmark import face_landmark_transform
-from image_artifact_fill.artifact_fill import face_artifact_fill
+from image_artifact_fill.artifact_fill import face_artifact_fill, combine_background
 
 
 def parse_args_and_config():
@@ -158,9 +158,25 @@ def main():
 
     try:
         runner = Diffusion(args, config)
-        runner.image_editing_sample(filled_image, sde_mask)
+        final_image = runner.image_editing_sample(filled_image, sde_mask)
     except Exception:
         logging.error(traceback.format_exc())
+
+    # include background
+    final_segment = segment.segmenting(image=final_image)
+    included_bg_image = combine_background(target_image, target_mask, final_image,
+                       final_segment)
+    
+    pix = cv2.cvtColor(included_bg_image, cv2.COLOR_RGB2BGR)
+    cv2.imwrite('.\exp\image_samples\images\samples_bg.png', pix)
+
+    plt.figure("final_image")
+    plt.imshow(final_image)
+    plt.figure("final_segment")
+    plt.imshow(final_segment)
+    plt.figure("included_bg_image")
+    plt.imshow(included_bg_image)
+    plt.show()
 
     return 0
 

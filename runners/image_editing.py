@@ -151,3 +151,6 @@ class Diffusion(object):
                                            f'samples_{it}.pth'))
                 tvu.save_image((x + 1) * 0.5, os.path.join(self.args.image_folder,
                                                            f'samples_{it}.png'))
+
+            a = (((x + 1) * 0.5).squeeze().permute(1,2,0) *255).cpu().numpy()
+            return np.clip(a, 0, 255).astype('uint8')
