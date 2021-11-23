@@ -42,6 +42,8 @@ def parse_args_and_config():
 
     # others
     # parser.add_argument('--had_bg', type=int, default=0, help='reserve background (1) or not (0)')
+    parser.add_argument('--is_erode_mask', type=int, default=1, help='erode mask before pass to SDEdit (1) or not (0)')
+    parser.add_argument('--erode_kernel_size', type=int, default=7, help='erode kernel size')
 
     args = parser.parse_args()
 
@@ -142,8 +144,10 @@ def main():
 
     # SDEdit
     sde_mask = transform_outputs['only_fixed_face']
-    # kernel = np.ones((5,5),np.uint8)
-    # erosion = cv2.erode(img, kernel,iterations = 1)
+    if args.is_erode_mask:
+        kernel_size = args.erode_kernel_size
+        kernel = np.ones((kernel_size, kernel_size), np.uint8)
+        sde_mask = cv2.erode(sde_mask, kernel,iterations = 1)
     
 
     print(">" * 80)
@@ -161,9 +165,13 @@ def main():
     return 0
 
 
-
+    # plt.axis('off')
     # plt.imshow(sde_mask)
     # plt.figure()
+    # plt.axis('off')
+    # plt.imshow(transformed_image)
+    # plt.figure()
+    # plt.axis('off')
     # plt.imshow(filled_image)
     # plt.figure()
     # plt.imshow(target_image)
