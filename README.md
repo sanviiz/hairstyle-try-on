@@ -38,3 +38,5 @@ python inference.py --seg_model_path image_segmentation/face_segment_checkpoints
 ```
 The results will shown in ```exp/image_samples``` folder
 
+## Acknowledgement
+The structure of this codebase is borrowed from [SDEdit](https://github.com/ermongroup/SDEdit).
