@@ -1,5 +1,5 @@
 # Realistic Hair Style Try-On: Face and Hair Image Mapping Using Semantic Maps for SDEdit (ECTI-CARD 2022)
-Sorayut Meeyim, Phalapat Tektrakul, Pakkaphong Akkabut, Werapon Chiracharit \
+[Sorayut Meeyim](https://github.com/sorayutmild), [Phalapat Tektrakul](https://github.com/phalapat), [Pakkaphong Akkabut](https://github.com/sanviiz), Werapon Chiracharit \
 [PROCEEDING ECTI-CARD 2022](https://ecticard2022.ecticard.org/program/PROCEEDING%20ECTI%20CARD2022.pdf), [Paper](https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/Realistic-Hairstyle-try-on-paper.pdf), [Slide](https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/Realistic-Hairstyle-try-on-presentation.pdf)
 
 <p align="center">
@@ -17,7 +17,6 @@ Machine learning-based image generation can create new person face images with n
 <p align="center">
   <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/interpolate.jpg?raw=true" alt="interpolate"/>
 </p>
-
 ## Requirements
 - Python 3.8.5 is used. Basic requirements are listed in the 'requirements.txt'.
 ```sh
