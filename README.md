@@ -17,6 +17,7 @@ Machine learning-based image generation can create new person face images with n
 <p align="center">
   <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/interpolate.jpg?raw=true" alt="interpolate"/>
 </p>
+
 ## Requirements
 - Python 3.8.5 is used. Basic requirements are listed in the 'requirements.txt'.
 ```sh
