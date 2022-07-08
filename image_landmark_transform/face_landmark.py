@@ -133,6 +133,10 @@ def face_landmark_transform(static_image, static_mask, transform_image, transfor
         'mask', transformed_mask_hair, static_mask_no_hair)
 
     only_fixed_face = set_anycolor_to_black(face_landmark_transform_mask.copy())
+    cv2.imwrite('report_images/only_fixed_face_color.png', cv2.cvtColor(only_fixed_face, cv2.COLOR_RGB2BGR))
+    t = color_mask_to_binary_mask_tensor(only_fixed_face.copy())
+    cv2.imwrite('report_images/only_fixed_face_binary.png', cv2.cvtColor(t, cv2.COLOR_RGB2BGR))
+
     
     output_object = {
         'result_image': face_landmark_transform_image,

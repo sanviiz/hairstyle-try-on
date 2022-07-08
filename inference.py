@@ -38,7 +38,7 @@ def parse_args_and_config():
     parser.add_argument('--image_size', type=tuple, default=(256,256), help='output image size (height, width)')
     parser.add_argument('--input_image_size', type=tuple, default=(256,256), help='input image size before segment (height, width)')
     parser.add_argument('--label_config', type=str, default=os.path.join("image_segmentation", "label.yml"), help='Path to the label.yml')
-    parser.add_argument('--save_forder', type=str, default='segmented_images', help='Path to the segmented folder')
+    # parser.add_argument('--save_forder', type=str, default='segmented_images', help='Path to the segmented folder')
 
     # others
     # parser.add_argument('--had_bg', type=int, default=0, help='reserve background (1) or not (0)')
@@ -138,6 +138,7 @@ def main():
     transform_outputs = face_landmark_transform(target_image, target_mask, source_image, source_mask)
     transformed_image, transformed_mask = transform_outputs["result_image"], transform_outputs["result_mask"]
     transformed_segment = segment.segmenting(image=transformed_image)
+    cv2.imwrite('report_images/transformed_mask.png', cv2.cvtColor(transformed_mask, cv2.COLOR_RGB2BGR))
 
     # fill artifacts 
     filled_image = face_artifact_fill(target_image, target_mask, transformed_image, transformed_mask, transformed_segment)
