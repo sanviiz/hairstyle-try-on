@@ -119,7 +119,9 @@ def dict2namespace(config):
 
 def main():
     args, config = parse_args_and_config()
-    segment = face_segment(args)
+    segment = face_segment(seg_model_path=args.seg_model_path, 
+                           label_config=args.label_config, 
+                           input_image_size=args.input_image_size)
     # read original image
     target_image = read_image(args.target_image_path)
     source_image = read_image(args.source_image_path)
@@ -158,7 +160,10 @@ def main():
     print("<" * 80)
 
     try:
-        runner = Diffusion(args, config)
+        runner = Diffusion(image_folder=args.image_folder, 
+                           sample_step=args.sample_step, 
+                           total_noise_levels=args.t, 
+                           config=config)
         runner.image_editing_sample(filled_image, sde_mask)
     except Exception:
         logging.error(traceback.format_exc())

@@ -9,6 +9,7 @@ from albumentations.pytorch import ToTensorV2
 from image_segmentation.model import UNET
 from image_segmentation.utils import load_checkpoint, label_to_image
 import yaml
+import streamlit as st
 
 def read_image_for_segment(image, transform, device='cuda'):
     # image = cv2.imread(image_path)
@@ -34,9 +35,12 @@ def tensor_to_numpy(tensor_image):
 
 
 class face_segment:
-    def __init__(self, args, device=None):
-        self.args = args
-        with open(self.args.label_config, 'r') as f:
+    def __init__(self, seg_model_path:str, label_config:str, input_image_size:tuple, device=None):
+        self.label_config = label_config
+        self.input_image_size = input_image_size
+        self.seg_model_path = seg_model_path
+        
+        with open(self.label_config, 'r') as f:
             self.label = yaml.safe_load(f)
             self.label['color'] = [np.array(c) for c in self.label['color']]   
 
@@ -46,7 +50,7 @@ class face_segment:
 
         self.transform = A.Compose(
                         [
-                            A.Resize(height=self.args.input_image_size[0], width=self.args.input_image_size[1]),
+                            A.Resize(height=self.input_image_size[0], width=self.input_image_size[1]),
                             A.Normalize(
                                 mean=[0.0, 0.0, 0.0],
                                 std=[1.0, 1.0, 1.0],
@@ -56,7 +60,7 @@ class face_segment:
                         ],
                         )
         self.model = UNET(in_channels=3, out_channels=5).to(device)
-        load_checkpoint(torch.load(os.path.join(self.args.seg_model_path)), self.model)
+        load_checkpoint(torch.load(os.path.join(self.seg_model_path)), self.model)
 
     def segmenting(self, image):
         image = read_image_for_segment(image, self.transform, self.device)

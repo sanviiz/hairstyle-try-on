@@ -1,5 +1,5 @@
 # Realistic Hair Style Try-On: Face and Hair Image Mapping Using Semantic Maps for SDEdit (ECTI-CARD 2022)
-[Sorayut Meeyim](https://github.com/sorayutmild), [Phalapat Tektrakul](https://github.com/phalapat), [Pakkaphong Akkabut](https://github.com/sanviiz), Werapon Chiracharit \
+[Sorayut Meeyim](https://github.com/sorayutmild), [Phalapat Tektrakul](https://github.com/phalapat), [Pakkaphong Akkabut](https://github.com/sanviiz), Werapon Chiracharit
 
 [PROCEEDING ECTI-CARD 2022](https://ecticard2022.ecticard.org/program/PROCEEDING%20ECTI%20CARD2022.pdf), [Paper](https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/Realistic-Hairstyle-try-on-paper.pdf), [Slide](https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/Realistic-Hairstyle-try-on-presentation.pdf)
 
@@ -24,7 +24,7 @@ Machine learning-based image generation can create new person face images with n
 ```sh
 pip install -r requirements.txt
 ```
-- Download face segmentation model from [this link]() and put it in ```image_segmentation/```
+- Download face segmentation model from [this link](https://mailkmuttacth-my.sharepoint.com/:u:/g/personal/sorayut_mild_mail_kmutt_ac_th/EVsziKH1BNZJihv0-3pxWAwBcAU3ydBSYk1wWbwTwGEQYA?e=JUmhc0) and put it in ```image_segmentation/```
 - Create ```checkpoints``` folder and Download  ```checkpoints/celeba_hq.ckpt ``` from [this link](https://image-editing-test-12345.s3-us-west-2.amazonaws.com/checkpoints/celeba_hq.ckpt) than put it in ```checkpoints```
 
 ## Demo

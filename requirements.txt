@@ -1,6 +1,7 @@
-pyyaml
+pyyaml==6.0
 tqdm==4.64.0
 mediapipe==0.8.10.1
+streamlit==1.10.0
 
 # CUDA 10.2
 --find-links https://download.pytorch.org/whl/torch_stable.html
