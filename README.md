@@ -24,10 +24,18 @@ Machine learning-based image generation can create new person face images with n
 ```sh
 pip install -r requirements.txt
 ```
-- Download face segmentation model from [this link](https://mailkmuttacth-my.sharepoint.com/:u:/g/personal/sorayut_mild_mail_kmutt_ac_th/EVsziKH1BNZJihv0-3pxWAwBcAU3ydBSYk1wWbwTwGEQYA?e=JUmhc0) and put it in ```image_segmentation/```
+- Download face segmentation model from [this link](https://drive.google.com/file/d/18niKm4oKM1TKM4HUvzVcWjLYSTrC5Ixm/view?usp=sharing) and put it in ```image_segmentation/```
 - Create ```checkpoints``` folder and Download  ```checkpoints/celeba_hq.ckpt ``` from [this link](https://image-editing-test-12345.s3-us-west-2.amazonaws.com/checkpoints/celeba_hq.ckpt) than put it in ```checkpoints```
 
-## Demo
+## Demo app
+This is streamlit app that deploy via Google colab. You can find it at [this link](https://colab.research.google.com/drive/1NnpGU2R4UXH87umbLNYD2IfMA0ss9AjE?usp=sharing)
+
+<p align="center">
+  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/webapp_demo.gif?raw=true" alt="overview"/>
+</p>
+
+
+## Inference
 You can run
 ```sh
 python inference.py --seg_model_path <image segmentation model> --t <Noise level> --target_image_path <target image path> --source_image_path <source image path>

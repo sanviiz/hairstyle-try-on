@@ -4,7 +4,7 @@ image_segmentation/__pycache__
 __pycache__*
 report_images/
 exp/
-hair-style-env
+hair-style-env/
 **__pycache__
 
 image_landmark_transform/test.py

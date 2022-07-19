@@ -118,6 +118,10 @@ class app:
         # fill artifacts 
         filled_image = face_artifact_fill(target_image, target_mask, transformed_image, transformed_mask, transformed_segment)
 
+        before_images = [target_mask, source_mask, transformed_image, filled_image]
+        before_images_captions = ['Target mask', 'Source mask', 'Transformed image', 'Filled image']
+        st.image(before_images, width=300, caption=before_images_captions, clamp=True)
+
         # SDEdit
         sde_mask = transform_outputs['only_fixed_face']
         if self.args['is_erode_mask']:
