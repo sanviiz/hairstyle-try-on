@@ -12,11 +12,11 @@ Machine learning-based image generation can create new person face images with n
 **Keywords:** Realistic hair style try-on, Semantic maps, SDEdit
 
 <p align="center">
-  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/overview.jpg?raw=true" alt="overview"/>
+  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/main/misc/overview.jpg?raw=true" alt="overview"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/interpolate.jpg?raw=true" alt="interpolate"/>
+  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/main/misc/interpolate.jpg?raw=true" alt="interpolate"/>
 </p>
 
 ## Requirements
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 This is streamlit app that deploy via Google colab. You can find it at [this link](https://colab.research.google.com/drive/1NnpGU2R4UXH87umbLNYD2IfMA0ss9AjE?usp=sharing)
 
 <p align="center">
-  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/dev-mild/misc/webapp_demo.gif?raw=true" alt="overview"/>
+  <img src="https://github.com/sanviiz/hairstyle-try-on/blob/main/misc/webapp_demo.gif?raw=true" alt="overview"/>
 </p>
 
 
